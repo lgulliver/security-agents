@@ -127,6 +127,33 @@ Look for:
 6. Do not raise findings for unchanged code outside the diff.
 7. Do not raise findings where confidence would be `low` and severity `medium` or below.
 
+---
+
+## Taxonomy Mapping
+
+Apply CWE and OWASP enrichment **only after a finding has been established from diff evidence**. Never generate a finding because a CWE or OWASP category exists.
+
+**CWE guidance for this agent's scope:**
+
+| Finding pattern | CWE |
+|---|---|
+| Missing ownership check | CWE-639 |
+| Improper access control | CWE-284 |
+| Privilege escalation (incorrect assignment) | CWE-266 |
+| Privilege escalation (improper management) | CWE-269 |
+| Incorrect authorization | CWE-863 |
+| SSRF via confused deputy | CWE-918 |
+
+**OWASP guidance for this agent's scope:** A01:2021-Broken Access Control for authorization and ownership findings; A03:2021-Injection for SSRF patterns; A07:2021-Identification and Authentication Failures for auth bypass findings.
+
+**Rules:**
+- Map to CWE/OWASP only when `taxonomy_confidence` is `high` or `medium`.
+- Omit `cwe`, `owasp`, and `mitre_attack` fields rather than guessing.
+- Set `mitre_attack: null` for all findings unless the diff clearly introduces a specific attacker technique.
+- Severity is determined by exploitability, impact, exposure, and confidence — not by taxonomy.
+
+See [../../security/taxonomies/cwe-mapping.md](../../security/taxonomies/cwe-mapping.md), [../../security/taxonomies/owasp-mapping.md](../../security/taxonomies/owasp-mapping.md), and [../../security/taxonomies/mitre-usage-guidance.md](../../security/taxonomies/mitre-usage-guidance.md).
+
 ### Output Template
 
 ```

@@ -38,6 +38,10 @@ security/
     secure-review-principles.md        # Core agent behaviour principles
     prompt-injection-hardening.md      # Prompt injection threat model and defences
     false-positive-guidance.md         # How to handle and suppress false positives
+  taxonomies/
+    cwe-mapping.md                     # CWE mappings for common finding patterns
+    owasp-mapping.md                   # OWASP Top 10 alignment guide
+    mitre-usage-guidance.md            # Policy for CWE/OWASP/MITRE ATT&CK usage
 
 examples/
   consuming-repo/
@@ -170,12 +174,15 @@ All findings follow a consistent schema:
   "blocking": true,
   "file": "path/to/file",
   "line": 123,
-  "category": "CWE-XXX / OWASP ASVS X.X",
   "finding": "Short finding title",
-  "evidence": "Specific evidence from the PR diff",
+  "evidence": "Specific evidence from the diff",
   "risk": "Why this matters",
   "exploit_scenario": "How this could be abused",
   "recommendation": "Concrete fix",
+  "cwe": "CWE-639",
+  "owasp": "A01:2021-Broken Access Control",
+  "mitre_attack": null,
+  "taxonomy_confidence": "high|medium|low|omitted",
   "false_positive_notes": "What would make this not an issue"
 }
 ```
@@ -232,6 +239,90 @@ Repository content — source code, comments, fixtures, markdown — may contain
 | [`secure-review-principles.md`](security/policies/secure-review-principles.md) | Core agent behaviour and scope principles |
 | [`prompt-injection-hardening.md`](security/policies/prompt-injection-hardening.md) | Prompt injection threat model and defences |
 | [`false-positive-guidance.md`](security/policies/false-positive-guidance.md) | How to evaluate and suppress false positives |
+
+---
+
+## MITRE / CWE / OWASP Taxonomy Support
+
+This repository supports CWE and OWASP Top 10 mappings as an **enrichment layer** for security findings. These taxonomies are for classification and reporting — they are not the basis for generating findings.
+
+### Design Principles
+
+- **Detection is evidence-first.** Agents reason from concrete PR diff evidence. A finding exists because the diff contains problematic code, not because a CWE or OWASP category exists.
+- **Taxonomy is optional enrichment.** The `cwe`, `owasp`, `mitre_attack`, and `taxonomy_confidence` fields are populated only when the mapping is high-confidence.
+- **Omit rather than guess.** If the correct CWE or OWASP category is uncertain, agents leave the field absent. An absent field is always better than a wrong one.
+- **CWE for engineering.** Use CWE for precise, code-level vulnerability classification and in bug tracking.
+- **OWASP for reporting.** Use OWASP Top 10 for executive and security-programme reporting.
+- **MITRE ATT&CK sparingly.** Apply only when the PR clearly introduces a specific attacker technique or detection-relevant behaviour. Most findings set `mitre_attack: null`.
+- **Severity is evidence-based.** Severity reflects exploitability, impact, exposure, and confidence — not the presence or absence of a taxonomy label.
+
+### Taxonomy Files
+
+| File | Description |
+|---|---|
+| [`security/taxonomies/cwe-mapping.md`](security/taxonomies/cwe-mapping.md) | High-confidence CWE mappings for common PR finding patterns |
+| [`security/taxonomies/owasp-mapping.md`](security/taxonomies/owasp-mapping.md) | OWASP Top 10 (2021) alignment guide |
+| [`security/taxonomies/mitre-usage-guidance.md`](security/taxonomies/mitre-usage-guidance.md) | Policy for when and how to apply each taxonomy |
+
+### Example: Correctly Mapped Finding
+
+The finding is established from evidence in the diff. Taxonomy is applied as enrichment only after the finding is confirmed.
+
+```json
+{
+  "agent": "authz-reviewer",
+  "severity": "high",
+  "confidence": "high",
+  "blocking": true,
+  "file": "src/api/documents.js",
+  "line": 47,
+  "finding": "Missing ownership check on document retrieval",
+  "evidence": "Document is fetched by `req.params.id` with no check that `document.owner_id === req.user.id`",
+  "risk": "Any authenticated user can read any other user's documents by guessing or enumerating document IDs",
+  "exploit_scenario": "Attacker authenticates, then iterates document IDs in the URL to access documents belonging to other users",
+  "recommendation": "Add an ownership check: after fetching the document, verify `document.owner_id === req.user.id` and return 403 if the check fails",
+  "cwe": "CWE-639",
+  "owasp": "A01:2021-Broken Access Control",
+  "mitre_attack": null,
+  "taxonomy_confidence": "high",
+  "false_positive_notes": "Would not be an issue if documents are intentionally public or if authorization is enforced at the database query level via row-level security"
+}
+```
+
+### Example: Taxonomy Correctly Omitted
+
+When the finding does not confidently map to a CWE, taxonomy fields are omitted. The finding is still valid and the severity is unaffected.
+
+```json
+{
+  "agent": "threat-model-reviewer",
+  "severity": "medium",
+  "confidence": "medium",
+  "blocking": false,
+  "file": "src/webhooks/handler.js",
+  "line": null,
+  "finding": "New webhook receiver processes external data without documented trust boundary",
+  "evidence": "PR adds a new `/webhooks/inbound` route that parses and stores payloads from an external partner without signature validation",
+  "risk": "Untrusted external data enters the system without verification; if the partner is compromised, malicious data could be injected",
+  "exploit_scenario": "An attacker who controls or spoofs the partner's webhook endpoint sends a crafted payload that exploits downstream processing logic",
+  "recommendation": "Add HMAC signature validation for incoming webhook payloads using a shared secret stored in the secrets manager",
+  "false_positive_notes": "Not an issue if the partner's webhook source IPs are strictly allowlisted at the network layer and the payloads are fully sanitised before processing"
+}
+```
+
+### Extending Mappings with Internal Controls
+
+Organisations can extend findings with internal control identifiers by adding them alongside CWE/OWASP in their local overlay or suppression configurations:
+
+```json
+{
+  "cwe": "CWE-798",
+  "owasp": "A02:2021-Cryptographic Failures",
+  "internal_control": "SEC-CRED-003"
+}
+```
+
+Add your organisation's control catalogue mappings in your consuming repository's overlay file using the `<!-- CUSTOMISATION POINT -->` markers as a guide.
 
 ---
 

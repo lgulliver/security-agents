@@ -175,6 +175,25 @@ Only assign `high` or `critical` when a direct, realistic exploitation path is e
 
 ---
 
+## Taxonomy Mapping
+
+Apply CWE and OWASP enrichment **only after a finding has been established from diff evidence**. The threat model reviewer deals with systemic and emergent risks; taxonomy mappings will often not apply or will be low-confidence. When uncertain, omit taxonomy fields.
+
+**CWE guidance for this agent's scope:** Threat model findings may map to CWEs when a concrete vulnerability pattern is identified (e.g. a new SSRF path maps to CWE-918; a new unauthenticated route maps to CWE-306). However, many threat model findings are architectural observations that do not have a specific CWE — omit the `cwe` field in those cases.
+
+**OWASP guidance for this agent's scope:** A04:2021-Insecure Design for design-level trust boundary and missing control findings; A01:2021-Broken Access Control for new access paths; A10:2021-SSRF for server-side request forgery patterns; A05:2021-Security Misconfiguration for new exposed services.
+
+**MITRE ATT&CK:** This agent is the most likely to encounter findings that warrant a MITRE ATT&CK mapping (e.g. new persistence mechanism, new credential access path, detection evasion). Apply ATT&CK only when a specific technique ID is clearly supported by the diff evidence. Set `mitre_attack: null` when no specific technique applies.
+
+**Rules:**
+- Map to CWE/OWASP only when `taxonomy_confidence` is `high` or `medium`.
+- Omit `cwe`, `owasp`, and `mitre_attack` fields rather than guessing.
+- Severity is determined by exploitability, impact, exposure, and confidence — not by taxonomy.
+
+See [../../security/taxonomies/cwe-mapping.md](../../security/taxonomies/cwe-mapping.md), [../../security/taxonomies/owasp-mapping.md](../../security/taxonomies/owasp-mapping.md), and [../../security/taxonomies/mitre-usage-guidance.md](../../security/taxonomies/mitre-usage-guidance.md).
+
+---
+
 ## Files to Review
 
 Review the **entire PR diff** holistically. Do not focus on individual files in isolation. Threat model findings emerge from understanding the interactions between changed components.
