@@ -70,12 +70,12 @@ Organisations may override the blocking behaviour in their consuming workflow co
 ```yaml
 # Example: advisory-only mode (no blocking)
 with:
-  blocking_mode: advisory
+  mode: advisory
 
-# Example: block on medium+high confidence
+# Example: block on medium severity with high confidence
 with:
-  blocking_threshold: "medium"
-  blocking_min_confidence: "high"
+  blocking_severity_threshold: "medium"
+  blocking_confidence_threshold: "high"
 ```
 
 <!-- CUSTOMISATION POINT: Implement these parameters in your consuming workflow wrapper. -->

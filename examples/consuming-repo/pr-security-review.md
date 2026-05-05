@@ -13,10 +13,22 @@ This file shows how a consuming repository imports and customises the central PR
 
 This workflow imports the central orchestrating agent from `lgulliver/security-agents`.
 
-```yaml
-# gh-aw workflow invocation example
+**Local CLI invocation** (replace `<PR_NUMBER>` with the actual pull request number):
+
+```bash
 gh aw run lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0 \
-  --with pr=${{ github.event.pull_request.number }}
+  --with pr=<PR_NUMBER>
+```
+
+**GitHub Actions step** (the `${{ github.event.pull_request.number }}` expression is evaluated by the Actions runner):
+
+```yaml
+- name: Run Security Review Agent
+  uses: github/agentic-workflows-action@v1   # Replace with actual gh-aw action
+  with:
+    workflow: lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0
+    pr: ${{ github.event.pull_request.number }}
+    mode: advisory
 ```
 
 Pin to a specific version tag. Do not use `@main` or `@latest` in production.

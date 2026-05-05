@@ -38,6 +38,8 @@ False positives erode trust and waste engineering time. Agents must apply a cons
 
 A finding must only be raised when the agent has reasonable certainty (confidence `medium` or `high`) that the code change introduces or worsens a real security risk.
 
+When the diff lacks sufficient context to evaluate a potential risk (e.g. only a partial hunk is visible), agents must **not** raise a formal finding. Instead, they may append a brief non-schema escalation note to their output (e.g. `⚠️ Insufficient context to review <area>; a human reviewer should inspect this.`). Escalation notes are always non-blocking and are never counted as findings.
+
 ---
 
 ### 4. Concise and Actionable Output

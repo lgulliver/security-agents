@@ -112,4 +112,4 @@ Confidence must be considered alongside severity when determining actionability:
 - Assign severity based on the **worst-case realistic impact** given the diff context.
 - Do not inflate severity to draw attention to a finding.
 - Do not deflate severity to avoid blocking a PR.
-- If the diff lacks sufficient context to assess severity accurately, assign `confidence: low` and elevate to a human reviewer via the `info` or `low` tier.
+- If the diff lacks sufficient context to assess severity accurately, do not raise a formal finding. Instead, add a brief non-schema escalation note (e.g. `⚠️ Insufficient context to review <area>; a human reviewer should inspect this.`) outside the findings list.

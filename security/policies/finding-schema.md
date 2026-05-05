@@ -14,7 +14,7 @@ Agents must not emit a finding unless they can populate every required field wit
   "confidence": "high | medium | low",
   "blocking": true | false,
   "file": "path/to/file.ext",
-  "line": 123,
+  "line": null,
   "category": "<CWE-ID | OWASP-category | internal-control-id>",
   "finding": "Short, descriptive finding title",
   "evidence": "Exact excerpt or description of the specific code/config change in the diff that triggered this finding",
@@ -24,6 +24,8 @@ Agents must not emit a finding unless they can populate every required field wit
   "false_positive_notes": "Conditions that would make this finding invalid (e.g. compensating controls, test-only context)"
 }
 ```
+
+> **Note:** `line` is optional. Set it to `null` (or omit it) when the exact line number cannot be determined from the diff.
 
 ---
 
