@@ -1,0 +1,23 @@
+# Startup preset
+# Lightweight configuration for small teams moving fast.
+# Advisory-only mode across all agents — findings are surfaced as comments
+# but never block merges. Recommended for Phase 1 rollout.
+
+mode: advisory
+
+agents:
+  security:
+    enabled: true
+    workflows:
+      - pr-security-review
+    blocking_severity_threshold: critical  # only block on critical
+    blocking_confidence_threshold: high
+
+  finops:
+    enabled: true
+    pr_review:
+      enabled: true
+      mode: advisory
+      blocking_on_tagging: false
+    weekly_analysis:
+      enabled: false  # enable once Azure credentials are configured

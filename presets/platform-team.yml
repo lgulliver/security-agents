@@ -1,0 +1,28 @@
+# Platform team preset
+# Balanced configuration for platform/SRE teams managing shared infrastructure.
+# Blocking on critical and high-confidence high severity findings.
+# FinOps PR review and weekly estate analysis both enabled.
+
+mode: blocking
+
+agents:
+  security:
+    enabled: true
+    workflows:
+      - pr-security-review
+      - iac-kubernetes-review
+      - dependency-supply-chain-review
+    blocking_severity_threshold: high
+    blocking_confidence_threshold: high
+
+  finops:
+    enabled: true
+    pr_review:
+      enabled: true
+      mode: blocking
+      blocking_on_tagging: true
+    weekly_analysis:
+      enabled: true
+      management_groups:
+        - mg-platform
+      create_issues: true

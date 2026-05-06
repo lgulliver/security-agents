@@ -1,0 +1,130 @@
+name: FinOps Weekly Estate Analysis
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      management_groups:
+        description: "Space-separated Management Group IDs (optional)"
+        type: string
+        default: ""
+      subscription_ids:
+        description: "Space-separated Subscription IDs (optional)"
+        type: string
+        default: ""
+      create_issues:
+        description: "Create GitHub issues for top recommendations"
+        type: boolean
+        default: true
+      create_remediation_prs:
+        description: "Attempt to create remediation PRs for auto-fix candidates"
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      management_groups:
+        description: "Space-separated Management Group IDs"
+        type: string
+        default: ""
+      subscription_ids:
+        description: "Space-separated Subscription IDs"
+        type: string
+        default: ""
+      create_issues:
+        description: "Create GitHub issues for top recommendations"
+        type: boolean
+        default: true
+      create_remediation_prs:
+        description: "Create remediation PRs for auto-fix candidates"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  finops-weekly-analysis:
+    name: FinOps Weekly Estate Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - name: Run FinOps Weekly Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          COST_EXPORT_STORAGE_ACCOUNT: ${{ secrets.COST_EXPORT_STORAGE_ACCOUNT }}
+        run: |
+          # Build CLI arguments from workflow inputs
+          ARGS="--output-dir ./reports --github-token $GITHUB_TOKEN --repo ${{ github.repository }}"
+
+          MG_INPUT="${{ inputs.management_groups }}"
+          if [ -n "$MG_INPUT" ]; then
+            ARGS="$ARGS --management-groups $MG_INPUT"
+          fi
+
+          SUB_INPUT="${{ inputs.subscription_ids }}"
+          if [ -n "$SUB_INPUT" ]; then
+            ARGS="$ARGS --subscription-ids $SUB_INPUT"
+          fi
+
+          if [ "${{ inputs.create_issues }}" = "true" ]; then
+            ARGS="$ARGS --create-issues"
+          fi
+
+          if [ "${{ inputs.create_remediation_prs }}" = "true" ]; then
+            ARGS="$ARGS --create-remediation-prs"
+          fi
+
+          python -m entrypoints.weekly_analysis $ARGS
+
+      - name: Upload FinOps Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: finops-report-${{ github.run_id }}
+          path: reports/finops-report-*.md
+          retention-days: 90
+
+      - name: Commit report to reports branch
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check out or create the reports branch
+          git fetch origin reports 2>/dev/null || true
+          git checkout reports 2>/dev/null || git checkout -b reports
+
+          cp reports/finops-report-*.md . 2>/dev/null || true
+          git add finops-report-*.md 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No report changes to commit"
+          else
+            git commit -m "finops: weekly report $(date +%Y-%m-%d)
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+            git push origin reports
+          fi

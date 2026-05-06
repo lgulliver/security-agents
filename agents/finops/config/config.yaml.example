@@ -1,0 +1,44 @@
+azure:
+  tenant_id: ""
+  management_groups: []
+  subscription_ids: []
+
+finops:
+  currency: GBP
+  cost_lookback_days: 30
+  metric_windows: [7, 30, 60, 90]
+  tagging:
+    mode: advisory  # advisory | blocking
+    required_tags:
+      - owner
+      - service
+      - product
+      - environment
+      - cost_center
+      - criticality
+      - managed_by
+    non_prod_environments:
+      - non-prod
+      - sandbox
+      - preview
+      - temporary
+      - ephemeral
+      - test
+      - dev
+      - development
+      - staging
+  rightsizing:
+    cpu_avg_threshold: 10.0
+    cpu_p95_threshold: 40.0
+  anomaly:
+    wow_spike_threshold: 0.20
+  waste:
+    snapshot_age_days: 90
+
+github:
+  token: ""  # use GITHUB_TOKEN env var in practice
+  labels:
+    open: finops/open
+    resolved: finops/resolved
+    suppressed: finops/suppressed
+    needs_review: finops/needs-review

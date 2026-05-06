@@ -1,0 +1,33 @@
+# Enterprise preset
+# Full suite configuration for organisations with mature security and FinOps programmes.
+# All agents enabled, blocking on high+ severity, weekly estate analysis across
+# all management groups.
+
+mode: blocking
+
+agents:
+  security:
+    enabled: true
+    workflows:
+      - pr-security-review
+      - authz-review
+      - secrets-config-review
+      - iac-kubernetes-review
+      - dependency-supply-chain-review
+      - data-exposure-review
+      - threat-model-review
+    blocking_severity_threshold: high
+    blocking_confidence_threshold: medium
+
+  finops:
+    enabled: true
+    pr_review:
+      enabled: true
+      mode: blocking
+      blocking_on_tagging: true
+    weekly_analysis:
+      enabled: true
+      management_groups:
+        - mg-root
+      create_issues: true
+      finance_approval_threshold_gbp: 2000

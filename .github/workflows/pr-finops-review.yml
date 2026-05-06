@@ -1,0 +1,82 @@
+name: FinOps PR Review
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_call:
+    inputs:
+      plan_json_path:
+        description: "Path to the Terraform plan JSON file"
+        type: string
+        default: "tfplan.json"
+      mode:
+        description: "Run mode: advisory or blocking"
+        type: string
+        default: "advisory"
+      blocking_on_tagging:
+        description: "Fail the PR if tagging issues are found"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  finops-pr-review:
+    name: FinOps PR Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Find or generate Terraform plan JSON
+        id: find_plan
+        run: |
+          PLAN_PATH="${{ inputs.plan_json_path || 'tfplan.json' }}"
+          if [ -f "$PLAN_PATH" ]; then
+            echo "plan_json=$PLAN_PATH" >> "$GITHUB_OUTPUT"
+            echo "Found plan at $PLAN_PATH"
+          elif [ -d ".terraform" ]; then
+            echo "Running terraform show to generate plan JSON"
+            terraform show -json tfplan > tfplan.json 2>/dev/null || true
+            if [ -f "tfplan.json" ]; then
+              echo "plan_json=tfplan.json" >> "$GITHUB_OUTPUT"
+            else
+              echo "No Terraform plan found; creating empty plan stub"
+              echo '{"resource_changes":[],"workspace":"default"}' > tfplan.json
+              echo "plan_json=tfplan.json" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "No Terraform plan found; creating empty plan stub"
+            echo '{"resource_changes":[],"workspace":"default"}' > tfplan.json
+            echo "plan_json=tfplan.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run FinOps PR Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MODE="${{ inputs.mode || 'advisory' }}"
+          python -m entrypoints.pr_review \
+            --plan-json "${{ steps.find_plan.outputs.plan_json }}" \
+            --mode "$MODE" \
+            --output-format markdown \
+            --github-token "$GITHUB_TOKEN" \
+            --repo "${{ github.repository }}" \
+            --pr-number "${{ github.event.pull_request.number }}"

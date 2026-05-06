@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "finops-agents"
+version = "0.1.0"
+description = "Azure FinOps multi-agent suite for PR review and weekly estate analysis"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["azure", "finops", "cost-optimisation", "terraform", "agents"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+]
+dependencies = [
+    "azure-identity>=1.15.0",
+    "azure-mgmt-resource>=23.0.0",
+    "azure-mgmt-subscription>=3.1.0",
+    "azure-mgmt-managementgroups>=1.0.0",
+    "azure-mgmt-resourcegraph>=8.0.0",
+    "azure-mgmt-costmanagement>=4.0.0",
+    "azure-mgmt-advisor>=9.0.0",
+    "azure-mgmt-monitor>=6.0.0",
+    "azure-mgmt-compute>=31.0.0",
+    "azure-mgmt-network>=25.0.0",
+    "azure-mgmt-storage>=21.0.0",
+    "azure-storage-blob>=12.19.0",
+    "pydantic>=2.5.0",
+    "PyGithub>=2.1.0",
+    "requests>=2.31.0",
+    "tenacity>=8.2.0",
+    "PyYAML>=6.0.1",
+    "tabulate>=0.9.0",
+    "python-dateutil>=2.8.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-mock>=3.12.0",
+]
+
+[project.scripts]
+finops-pr-review = "entrypoints.pr_review:main"
+finops-weekly-analysis = "entrypoints.weekly_analysis:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agents*", "models*", "entrypoints*"]

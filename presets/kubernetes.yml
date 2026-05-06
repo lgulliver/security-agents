@@ -1,0 +1,31 @@
+# Kubernetes preset
+# Focused configuration for teams deploying primarily to Kubernetes.
+# Emphasises IaC, container security, and RBAC review.
+# FinOps configured for AKS cost governance.
+
+mode: blocking
+
+agents:
+  security:
+    enabled: true
+    workflows:
+      - pr-security-review
+      - iac-kubernetes-review
+      - secrets-config-review
+    blocking_severity_threshold: high
+    blocking_confidence_threshold: high
+
+  finops:
+    enabled: true
+    pr_review:
+      enabled: true
+      mode: advisory
+      sku_sanity:
+        flag_aks_overprovisioning: true
+        nonprod_vm_size_limit: Standard_D4s_v3
+    weekly_analysis:
+      enabled: true
+      focus_services:
+        - aks
+        - container-registry
+      create_issues: true
