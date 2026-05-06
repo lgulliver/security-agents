@@ -1,0 +1,67 @@
+# Example: FinOps PR Review
+#
+# Copy this file to your repository at .github/workflows/finops-pr-review.yml
+# and adjust the inputs to match your setup.
+#
+# This workflow calls the reusable FinOps PR review from lgulliver/agents.
+# It must run AFTER a step that produces a Terraform plan JSON (tfplan.json).
+#
+# Required secrets: none beyond GITHUB_TOKEN (provided automatically).
+# Optional secrets: INFRACOST_API_KEY for richer cost estimates.
+
+name: FinOps PR Review
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**.tf"
+      - "**.tfvars"
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      plan_json: ${{ steps.plan.outputs.plan_json }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # CUSTOMISATION POINT: replace with your Terraform setup steps
+      # (e.g. configure Azure credentials, backend, workspace)
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -out=tfplan
+          terraform show -json tfplan > tfplan.json
+          echo "plan_json=tfplan.json" >> "$GITHUB_OUTPUT"
+
+      - name: Upload plan JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-json
+          path: tfplan.json
+          retention-days: 1
+
+  finops-review:
+    name: FinOps Review
+    needs: terraform-plan
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    uses: lgulliver/agents/.github/workflows/pr-finops-review.yml@v1.0.0
+    with:
+      plan_json_path: tfplan.json
+      # CUSTOMISATION POINT: switch to 'blocking' after Phase 1 calibration
+      mode: advisory
+      # CUSTOMISATION POINT: set to true to fail PRs missing required tags
+      blocking_on_tagging: false
+    secrets: inherit

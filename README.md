@@ -67,6 +67,7 @@ presets/
 examples/
   github-action/
     consuming-repo/                    # Example overlay for security review
+    finops/                            # Example workflows for FinOps PR review and weekly analysis
   github-app/                          # Coming soon
   self-hosted/                         # Coming soon
 ```
@@ -163,9 +164,11 @@ jobs:
 
 ## How to Run FinOps Agents
 
-See [`agents/finops/README.md`](agents/finops/README.md) for full setup, configuration, and usage.
+See [`examples/github-action/finops/README.md`](examples/github-action/finops/README.md) for a full setup guide including prerequisites, rollout phases, and configuration reference. See [`agents/finops/README.md`](agents/finops/README.md) for the agent internals.
 
 ### PR Review (Reusable GitHub Actions Workflow)
+
+Copy [`examples/github-action/finops/pr-review.yml`](examples/github-action/finops/pr-review.yml) to your repository and call the reusable workflow after your Terraform plan step:
 
 ```yaml
 jobs:
@@ -173,12 +176,14 @@ jobs:
     uses: lgulliver/agents/.github/workflows/pr-finops-review.yml@v1.0.0
     with:
       plan_json_path: tfplan.json
-      mode: advisory
+      mode: advisory              # Switch to 'blocking' after calibration
       blocking_on_tagging: false
     secrets: inherit
 ```
 
 ### Weekly Estate Analysis
+
+Copy [`examples/github-action/finops/weekly-analysis.yml`](examples/github-action/finops/weekly-analysis.yml) to your repository and set your management group or subscription IDs:
 
 ```yaml
 jobs:
@@ -189,6 +194,8 @@ jobs:
       create_issues: true
     secrets: inherit
 ```
+
+Required secrets: `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`. See the [example README](examples/github-action/finops/README.md) for the required Azure RBAC roles.
 
 ---
 

@@ -1,0 +1,58 @@
+# Example: FinOps Weekly Estate Analysis
+#
+# Copy this file to your repository at .github/workflows/finops-weekly-analysis.yml
+# and fill in your management_groups or subscription_ids.
+#
+# This workflow calls the reusable weekly estate analysis from lgulliver/agents.
+#
+# Required secrets (add to Settings → Secrets and variables → Actions):
+#   AZURE_CLIENT_ID       — service principal client ID
+#   AZURE_CLIENT_SECRET   — service principal client secret
+#   AZURE_TENANT_ID       — Azure tenant ID
+#
+# Optional secrets:
+#   COST_EXPORT_STORAGE_ACCOUNT — storage account name for Cost Management exports
+#
+# The service principal needs Reader + Cost Management Reader + Monitoring Reader
+# at Management Group or Subscription scope.
+
+name: FinOps Weekly Estate Analysis
+
+on:
+  # CUSTOMISATION POINT: adjust schedule or remove to use workflow_dispatch only
+  schedule:
+    - cron: "0 6 * * 1"   # Every Monday at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      management_groups:
+        description: "Override management groups (space-separated IDs)"
+        type: string
+        default: ""
+      create_issues:
+        description: "Create GitHub issues for top recommendations"
+        type: boolean
+        default: true
+
+jobs:
+  finops-weekly:
+    name: FinOps Weekly Analysis
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      checks: write
+    uses: lgulliver/agents/.github/workflows/weekly-estate-analysis.yml@v1.0.0
+    with:
+      # CUSTOMISATION POINT: set your Management Group IDs (space-separated)
+      # Use management_groups OR subscription_ids — not both.
+      management_groups: "mg-prod mg-nonprod"
+
+      # CUSTOMISATION POINT: alternatively, list specific subscription IDs
+      # subscription_ids: "00000000-0000-0000-0000-000000000000"
+
+      # CUSTOMISATION POINT: set to true once you have reviewed Phase 1 reports
+      create_issues: false
+
+      # CUSTOMISATION POINT: enable once create_issues is working well
+      create_remediation_prs: false
+    secrets: inherit
