@@ -89,7 +89,7 @@ Agents must operate with the minimum permissions necessary:
 
 ### 8. No Company-Specific Assumptions
 
-Generic agents in `.github/agentic-workflows/` must not:
+Generic agents in `agents/security/` must not:
 - Reference specific companies, products, or services.
 - Assume specific frameworks, languages, or cloud providers unless scoped to a specialist agent.
 - Use hardcoded approval lists, vendor names, or internal tool names.

@@ -1,16 +1,16 @@
-# Contributing to security-agents
+# Contributing to agents
 
-Thank you for your interest in contributing. This repository provides generic, organisation-agnostic security review agents. Contributions must meet a high quality bar to ensure the agents remain trustworthy, accurate, and useful for all consuming organisations.
+Thank you for your interest in contributing. This repository provides generic, organisation-agnostic review agents across security, FinOps, and more. Contributions must meet a high quality bar to ensure the agents remain trustworthy, accurate, and useful for all consuming organisations.
 
 ---
 
 ## Principles for Contributors
 
-1. **Security scope only.** Agent prompts must not include instructions to review style, performance, naming, or refactoring.
+1. **Domain scope only.** Agent prompts must not stray outside their designated domain (e.g. security agents must not review style, performance, or refactoring).
 2. **Generic and portable.** Do not introduce company-specific assumptions, vendor-specific APIs, or internal tool names.
-3. **Evidence-based.** Any new review focus area must require direct evidence from the diff before a finding is raised.
+3. **Evidence-based.** Any new review focus area must require direct evidence from the diff or cloud data before a finding is raised.
 4. **Prefer no finding over speculative findings.** New focus areas should have a clear, demonstrable signal.
-5. **Prompt injection hardened.** Any new agent must include the standard behavioural constraints from the existing agents.
+5. **Prompt injection hardened.** Any new security agent must include the standard behavioural constraints from the existing agents.
 
 ---
 
@@ -19,9 +19,11 @@ Thank you for your interest in contributing. This repository provides generic, o
 ### ✅ Welcome
 
 - New or improved review focus areas within an existing agent's scope.
-- New specialist agents for security domains not yet covered.
+- New specialist agents for security or FinOps domains not yet covered.
+- New agent domains (reliability, observability, k8s, architecture, change-risk).
 - Improvements to the finding schema, severity rubric, or blocking policy.
 - New policy documents (e.g. guidance for specific regulatory frameworks).
+- New or improved FinOps analysis logic, with tests.
 - Improvements to the example consuming repository.
 - Bug fixes where an agent's instructions produce incorrect behaviour.
 - Documentation improvements.
@@ -33,6 +35,7 @@ Thank you for your interest in contributing. This repository provides generic, o
 - Changes that weaken the prompt injection hardening.
 - Changes that lower the evidence requirement for findings.
 - Style, formatting, or performance review instructions added to security agents.
+- FinOps agents without accompanying tests.
 
 ---
 
@@ -65,13 +68,14 @@ Follow the structure and conventions in the existing files:
 Before submitting, verify:
 
 - [ ] No company-specific assumptions introduced.
-- [ ] All new review focus areas require direct evidence from the diff.
-- [ ] Standard behavioural constraints are present in any new agent.
-- [ ] Finding output format matches the schema in `finding-schema.md`.
-- [ ] Severity assignments match the `severity-rubric.md`.
-- [ ] Blocking rules match the `blocking-policy.md`.
+- [ ] All new review focus areas require direct evidence from the diff or cloud data.
+- [ ] Standard behavioural constraints are present in any new security agent.
+- [ ] Finding output format matches the schema in `agents/security/policies/finding-schema.md`.
+- [ ] Severity assignments match the `agents/security/policies/severity-rubric.md`.
+- [ ] Blocking rules match the `agents/security/policies/blocking-policy.md`.
 - [ ] `<!-- CUSTOMISATION POINT -->` markers are present where applicable.
 - [ ] Policy file cross-references use relative links.
+- [ ] New FinOps agents include tests in `agents/finops/tests/`.
 - [ ] CHANGELOG.md updated with a summary of the change.
 
 ### 5. Submit a Pull Request

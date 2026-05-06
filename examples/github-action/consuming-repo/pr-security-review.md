@@ -1,6 +1,6 @@
 # PR Security Review — Example Consuming Repository
 
-This file shows how a consuming repository imports and customises the central PR security review workflow from `lgulliver/security-agents`.
+This file shows how a consuming repository imports and customises the central PR security review workflow from `lgulliver/agents`.
 
 ---
 
@@ -11,12 +11,12 @@ This file shows how a consuming repository imports and customises the central PR
 
 ## Import
 
-This workflow imports the central orchestrating agent from `lgulliver/security-agents`.
+This workflow imports the central orchestrating agent from `lgulliver/agents`.
 
 **Local CLI invocation** (replace `<PR_NUMBER>` with the actual pull request number):
 
 ```bash
-gh aw run lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0 \
+gh aw run lgulliver/agents/agents/security/pr-security-review.md@v1.0.0 \
   --with pr=<PR_NUMBER>
 ```
 
@@ -26,7 +26,7 @@ gh aw run lgulliver/security-agents/.github/agentic-workflows/pr-security-review
 - name: Run Security Review Agent
   uses: github/agentic-workflows-action@v1   # Replace with actual gh-aw action
   with:
-    workflow: lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0
+    workflow: lgulliver/agents/agents/security/pr-security-review.md@v1.0.0
     pr: ${{ github.event.pull_request.number }}
     mode: advisory
 ```
@@ -91,7 +91,7 @@ The following context helps the `threat-model-reviewer` reason about trust bound
 
 Suppressions are managed in [`.security-ignore`](./.security-ignore).
 
-All suppressions require approval from the security team. See [false-positive-guidance.md](https://github.com/lgulliver/security-agents/blob/main/security/policies/false-positive-guidance.md).
+All suppressions require approval from the security team. See [false-positive-guidance.md](https://github.com/lgulliver/agents/blob/main/agents/security/policies/false-positive-guidance.md).
 
 ---
 
@@ -117,7 +117,7 @@ jobs:
       - name: Run Security Review Agent
         uses: github/agentic-workflows-action@v1   # Replace with actual gh-aw action
         with:
-          workflow: lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0
+          workflow: lgulliver/agents/agents/security/pr-security-review.md@v1.0.0
           pr: ${{ github.event.pull_request.number }}
           # CUSTOMISATION POINT: Switch to 'blocking' after Phase 1 rollout
           mode: advisory
@@ -128,6 +128,6 @@ jobs:
 ## Notes
 
 - This example pins the workflow to `v1.0.0`. Update the tag when new versions are released.
-- Review the [CHANGELOG](https://github.com/lgulliver/security-agents/blob/main/CHANGELOG.md) before upgrading.
+- Review the [CHANGELOG](https://github.com/lgulliver/agents/blob/main/CHANGELOG.md) before upgrading.
 - Local customisations in this file take precedence over the central workflow defaults.
-- Do not edit the central workflow files in `lgulliver/security-agents` directly for organisation-specific needs. Add customisations here instead.
+- Do not edit the central workflow files in `lgulliver/agents` directly for organisation-specific needs. Add customisations here instead.

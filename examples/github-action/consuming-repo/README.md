@@ -1,6 +1,6 @@
 # Example: Consuming Repository
 
-This directory contains a reference example showing how an organisation imports and customises the PR security review workflows from `lgulliver/security-agents` into their own repository.
+This directory contains a reference example showing how an organisation imports and customises the PR security review workflows from `lgulliver/agents` into their own repository.
 
 ---
 
@@ -30,10 +30,10 @@ your-repo/
 In your copied `pr-security-review.md`, update the version tag to the latest release:
 
 ```
-lgulliver/security-agents/.github/agentic-workflows/pr-security-review.md@v1.0.0
+lgulliver/agents/agents/security/pr-security-review.md@v1.0.0
 ```
 
-Check the [releases page](https://github.com/lgulliver/security-agents/releases) for the latest tag.
+Check the [releases page](https://github.com/lgulliver/agents/releases) for the latest tag.
 
 ### Step 3: Fill in Organisation Context
 
@@ -55,7 +55,7 @@ Start in `mode: advisory`. All findings will be posted as comments but will not 
 - Document suppressions in `.security-ignore`.
 - Build team familiarity with the findings format.
 
-Recommended advisory period: at least 4 weeks. See the [blocking policy](https://github.com/lgulliver/security-agents/blob/main/security/policies/blocking-policy.md) for rollout phases.
+Recommended advisory period: at least 4 weeks. See the [blocking policy](https://github.com/lgulliver/agents/blob/main/agents/security/policies/blocking-policy.md) for rollout phases.
 
 ### Step 6: Enable Blocking Mode
 
@@ -106,7 +106,7 @@ suppressions:
     issue: "https://github.com/your-org/your-repo/issues/42"
 ```
 
-See [false-positive-guidance.md](https://github.com/lgulliver/security-agents/blob/main/security/policies/false-positive-guidance.md) for full suppression guidance.
+See [false-positive-guidance.md](https://github.com/lgulliver/agents/blob/main/agents/security/policies/false-positive-guidance.md) for full suppression guidance.
 
 ---
 
@@ -118,6 +118,6 @@ This repository follows [semantic versioning](https://semver.org/):
 - **Minor releases** (`v1.x.0`): new agent capabilities, non-breaking changes.
 - **Major releases** (`vX.0.0`): breaking changes to the finding schema or agent IDs.
 
-Subscribe to releases on the [security-agents repository](https://github.com/lgulliver/security-agents) to be notified of updates.
+Subscribe to releases on the [security-agents repository](https://github.com/lgulliver/agents) to be notified of updates.
 
-Review the [CHANGELOG](https://github.com/lgulliver/security-agents/blob/main/CHANGELOG.md) before upgrading across major versions.
+Review the [CHANGELOG](https://github.com/lgulliver/agents/blob/main/CHANGELOG.md) before upgrading across major versions.
