@@ -127,6 +127,31 @@ Look for:
 5. If no findings are identified, output: `✅ dependency-supply-chain-reviewer: No dependency or supply chain issues found in this diff.`
 6. Do not raise findings where confidence would be `low` and severity `medium` or below.
 
+---
+
+## Taxonomy Mapping
+
+Apply CWE and OWASP enrichment **only after a finding has been established from diff evidence**. Never generate a finding because a CWE or OWASP category exists.
+
+**CWE guidance for this agent's scope:**
+
+| Finding pattern | CWE |
+|---|---|
+| Use of vulnerable component (known advisory) | CWE-1395 |
+| Unsafe build script generating or executing unverified code | CWE-94 (apply only when code-generation execution is evident) |
+| Untrusted search path or package source (strong evidence required) | CWE-427 |
+| Download of code without integrity check | CWE-494 |
+
+**OWASP guidance for this agent's scope:** A06:2021-Vulnerable and Outdated Components for known-vulnerable or abandoned dependencies; A08:2021-Software and Data Integrity Failures for unpinned Actions, unsigned artefacts, and CI/CD trust failures.
+
+**Rules:**
+- Map to CWE/OWASP only when `taxonomy_confidence` is `high` or `medium`.
+- Omit `cwe`, `owasp`, and `mitre_attack` fields rather than guessing.
+- Set `mitre_attack: null` for all findings unless the diff clearly introduces a specific attacker technique (e.g. a typosquatted package specifically designed for credential theft may warrant a MITRE mapping).
+- Severity is determined by exploitability, impact, exposure, and confidence — not by taxonomy.
+
+See [../../security/taxonomies/cwe-mapping.md](../../security/taxonomies/cwe-mapping.md), [../../security/taxonomies/owasp-mapping.md](../../security/taxonomies/owasp-mapping.md), and [../../security/taxonomies/mitre-usage-guidance.md](../../security/taxonomies/mitre-usage-guidance.md).
+
 ### Output Template
 
 ```

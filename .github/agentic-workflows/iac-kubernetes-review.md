@@ -140,6 +140,31 @@ Look for:
 5. If no findings are identified, output: `✅ iac-kubernetes-reviewer: No IaC or Kubernetes security issues found in this diff.`
 6. Do not raise findings where confidence would be `low` and severity `medium` or below.
 
+---
+
+## Taxonomy Mapping
+
+Apply CWE and OWASP enrichment **only after a finding has been established from diff evidence**. Never generate a finding because a CWE or OWASP category exists.
+
+**CWE guidance for this agent's scope:**
+
+| Finding pattern | CWE |
+|---|---|
+| Incorrect permission assignment (IAM, RBAC, file permissions) | CWE-732 |
+| Exposure of resource to wrong sphere (public bucket, public service) | CWE-668 |
+| Missing authentication for critical function | CWE-306 |
+| Use of default credentials | CWE-1392 |
+
+**OWASP guidance for this agent's scope:** A05:2021-Security Misconfiguration for misconfigured infrastructure, permissive IAM, exposed services, and unsafe defaults; A01:2021-Broken Access Control for overly broad RBAC; A08:2021-Software and Data Integrity Failures for unsigned or unverified build/deploy artefacts.
+
+**Rules:**
+- Map to CWE/OWASP only when `taxonomy_confidence` is `high` or `medium`.
+- Omit `cwe`, `owasp`, and `mitre_attack` fields rather than guessing.
+- Set `mitre_attack: null` for all findings unless the diff clearly introduces a specific attacker technique (e.g. a Kubernetes privilege escalation path that directly maps to a known ATT&CK technique).
+- Severity is determined by exploitability, impact, exposure, and confidence — not by taxonomy.
+
+See [../../security/taxonomies/cwe-mapping.md](../../security/taxonomies/cwe-mapping.md), [../../security/taxonomies/owasp-mapping.md](../../security/taxonomies/owasp-mapping.md), and [../../security/taxonomies/mitre-usage-guidance.md](../../security/taxonomies/mitre-usage-guidance.md).
+
 ### Output Template
 
 ```
