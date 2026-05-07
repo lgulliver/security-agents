@@ -1,0 +1,26 @@
+# Example GitHub Copilot Extension manifest
+#
+# Copy this file to your GitHub App configuration and fill in the values.
+# See: https://docs.github.com/en/copilot/building-copilot-extensions/setting-up-copilot-extensions
+
+name: lgulliver-agents
+description: AI-powered PR security review and cloud governance agents
+icon: shield
+
+# The public URL where your extension server is deployed.
+# Replace with your actual deployment URL (e.g. a Railway, Render, or Fly.io deployment).
+url: https://your-deployment-url.example.com
+
+# OAuth callback URL for user authorisation (required by GitHub Apps).
+callback_url: https://your-deployment-url.example.com/auth/callback
+
+# Link shown to users in the Copilot chat interface.
+homepage_url: https://github.com/lgulliver/agents
+
+# Extension type: "agent" gives full control over the conversation and system prompt.
+# Use "skillset" if you prefer to expose discrete callable skills instead.
+type: agent
+
+# Permissions required by the extension.
+permissions:
+  - pull_requests: read   # Read PR content for security review

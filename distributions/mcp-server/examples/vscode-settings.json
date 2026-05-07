@@ -1,0 +1,10 @@
+{
+  "mcp": {
+    "servers": {
+      "lgulliver-agents": {
+        "command": "agents-mcp",
+        "comment": "After installing: pip install -e /path/to/lgulliver-agents/distributions/mcp-server"
+      }
+    }
+  }
+}

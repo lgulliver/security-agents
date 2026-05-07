@@ -70,6 +70,15 @@ examples/
     finops/                            # Example workflows for FinOps PR review and weekly analysis
   github-app/                          # Coming soon
   self-hosted/                         # Coming soon
+
+distributions/
+  mcp-server/                          # Python MCP server (Claude Desktop, VS Code, Cursor)
+    src/agents_mcp/server.py           # MCP prompts + resources for all security agents
+    pyproject.toml                     # pip-installable package
+    examples/                          # Claude Desktop and VS Code config snippets
+  copilot-extension/                   # GitHub Copilot Extension (TypeScript/Node.js)
+    src/                               # Express server + agent loader + Copilot handler
+    copilot-extension.yml              # GitHub App manifest reference
 ```
 
 ---
@@ -319,6 +328,45 @@ Security findings support CWE and OWASP Top 10 mappings as an **enrichment layer
 | [`agents/security/taxonomies/cwe-mapping.md`](agents/security/taxonomies/cwe-mapping.md) | High-confidence CWE mappings for common PR finding patterns |
 | [`agents/security/taxonomies/owasp-mapping.md`](agents/security/taxonomies/owasp-mapping.md) | OWASP Top 10 (2021) alignment guide |
 | [`agents/security/taxonomies/mitre-usage-guidance.md`](agents/security/taxonomies/mitre-usage-guidance.md) | Policy for when and how to apply each taxonomy |
+
+---
+
+## Using Agents as Plugins and Copilot Extensions
+
+The `distributions/` directory packages the canonical agent definitions for different host platforms. One source of truth, multiple distributions.
+
+### MCP Server (Claude Desktop, VS Code, Cursor)
+
+The [`distributions/mcp-server`](distributions/mcp-server/) directory contains a Python MCP server that exposes every security agent as an **MCP prompt** and every policy document as an **MCP resource**.
+
+Works with any MCP-compatible host: Claude Desktop, VS Code with MCP, Cursor, Continue, and others.
+
+```bash
+# Install
+pip install -e distributions/mcp-server
+
+# Add to Claude Desktop (~/.claude/claude_desktop_config.json)
+# {
+#   "mcpServers": {
+#     "lgulliver-agents": { "command": "agents-mcp" }
+#   }
+# }
+```
+
+See [`distributions/mcp-server/README.md`](distributions/mcp-server/README.md) for full setup instructions.
+
+### GitHub Copilot Extension
+
+The [`distributions/copilot-extension`](distributions/copilot-extension/) directory contains a Node.js/TypeScript server that exposes the agents as a **GitHub Copilot Extension** (`@lgulliver-agents`).
+
+Once deployed and registered as a GitHub App, users can invoke the agents directly from Copilot chat in the browser, VS Code, and GitHub Mobile.
+
+```bash
+cd distributions/copilot-extension
+npm install && npm run build && npm start
+```
+
+See [`distributions/copilot-extension/README.md`](distributions/copilot-extension/README.md) for GitHub App setup instructions.
 
 ---
 
